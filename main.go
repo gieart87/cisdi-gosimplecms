@@ -1,0 +1,95 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
+	"gosimplecms/configs"
+	"gosimplecms/controllers/posts/list"
+	"gosimplecms/controllers/user/login"
+	"gosimplecms/controllers/user/register"
+	_ "gosimplecms/docs"
+	"gosimplecms/models"
+	"gosimplecms/repositories"
+	"gosimplecms/routes"
+	"gosimplecms/services"
+	"log"
+)
+
+// @title Go Simple CMS API
+// @version 1.0
+// @description This is a simple API with JWT Auth, RBAC, and Clean Architecture.
+// @host localhost:8080
+// @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+func main() {
+	err := godotenv.Load(".env")
+	if err != nil {
+		panic("Error loading .env file")
+	}
+
+	mode := flag.String("mode", "serve", "Mode to run: serve | migrate | seed")
+	port := flag.String("port", "8080", "Port to run server on")
+	flag.Parse()
+
+	switch *mode {
+	case "serve":
+		startServer(*port)
+	case "migrate":
+		runMigration()
+	case "seed":
+		runSeeder()
+	default:
+		fmt.Println("Unknown mode:", *mode)
+	}
+}
+
+func startServer(port string) {
+
+	//gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	configs.ConnectDatabase()
+
+	userRepo := repositories.NewUserRepository()
+	userService := services.NewUserService(userRepo)
+	userRegisterController := register.NewUserRegisterController(userService)
+	userLoginController := login.NewUserLoginController(userService)
+
+	postRepo := repositories.NewPostRepository()
+	postService := services.NewPostService(postRepo)
+	listPostController := list.NewListPostController(postService)
+
+	routes.SetupRoutes(r,
+		userRegisterController,
+		userLoginController,
+		listPostController,
+	)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.Run(":" + port)
+}
+
+func runMigration() {
+	configs.ConnectDatabase()
+
+	err := configs.DB.AutoMigrate(
+		&models.User{},
+		&models.Post{},
+	)
+	if err != nil {
+		log.Fatal("❌ Migration failed:", err)
+	}
+	fmt.Println("✅ Migration completed")
+}
+
+func runSeeder() {
+	configs.ConnectDatabase()
+	// TODO: Add your seeding logic here
+	fmt.Println("✅ Seeder executed (placeholder)")
+}
