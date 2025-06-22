@@ -1,5 +1,21 @@
 basePath: /
 definitions:
+  models.CreateCategoryRequest:
+    properties:
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
+  models.CreateUpdateCategoryResponse:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
   models.LoginRequest:
     properties:
       email:
@@ -41,15 +57,64 @@ info:
   title: Go Simple CMS API
   version: "1.0"
 paths:
+  /api/v1/admin/categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CreateUpdateCategoryResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all categories
+      tags:
+      - Manage Categories
+    post:
+      consumes:
+      - application/json
+      description: Create a new category
+      parameters:
+      - description: Category data
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateCategoryRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CreateUpdateCategoryResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new category
+      tags:
+      - Manage Categories
   /login:
     post:
       consumes:
       - application/json
-      description: Create a new user account
+      description: Create a new users account
       parameters:
       - description: User login
         in: body
-        name: user
+        name: users
         required: true
         schema:
           $ref: '#/definitions/models.LoginRequest'
@@ -66,18 +131,18 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Login user
+      summary: Login users
       tags:
       - Auth
   /register:
     post:
       consumes:
       - application/json
-      description: Create a new user account
+      description: Create a new users account
       parameters:
       - description: User registration data
         in: body
-        name: user
+        name: users
         required: true
         schema:
           $ref: '#/definitions/models.RegisterRequest'
@@ -94,7 +159,7 @@ paths:
             additionalProperties:
               type: string
             type: object
-      summary: Register a new user
+      summary: Register a new users
       tags:
       - Auth
 securityDefinitions:

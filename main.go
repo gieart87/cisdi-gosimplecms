@@ -8,9 +8,11 @@ import (
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	"gosimplecms/configs"
+	adminCategoryCreate "gosimplecms/controllers/admin/categories/create"
+	adminCategoryList "gosimplecms/controllers/admin/categories/list"
 	"gosimplecms/controllers/posts/list"
-	"gosimplecms/controllers/user/login"
-	"gosimplecms/controllers/user/register"
+	"gosimplecms/controllers/users/login"
+	"gosimplecms/controllers/users/register"
 	_ "gosimplecms/docs"
 	"gosimplecms/models"
 	"gosimplecms/repositories"
@@ -64,10 +66,17 @@ func startServer(port string) {
 	postService := services.NewPostService(postRepo)
 	listPostController := list.NewListPostController(postService)
 
+	categoryRepo := repositories.NewCategoryRepository()
+	categoryService := services.NewCategoryService(categoryRepo)
+	adminCategoryCreateController := adminCategoryCreate.NewCategoryCreateController(categoryService)
+	adminCategoryListController := adminCategoryList.NewCategoryListController(categoryService)
+
 	routes.SetupRoutes(r,
 		userRegisterController,
 		userLoginController,
 		listPostController,
+		adminCategoryCreateController,
+		adminCategoryListController,
 	)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -80,7 +89,10 @@ func runMigration() {
 
 	err := configs.DB.AutoMigrate(
 		&models.User{},
+		&models.Category{},
+		&models.Tag{},
 		&models.Post{},
+		&models.PostVersion{},
 	)
 	if err != nil {
 		log.Fatal("❌ Migration failed:", err)

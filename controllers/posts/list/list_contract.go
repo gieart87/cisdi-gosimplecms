@@ -29,17 +29,7 @@ func (ctl *PostListController) transformToResponse(posts []models.Post) *Respons
 
 	for _, post := range posts {
 		response.Data = append(response.Data, &Post{
-			ID:     post.ID,
-			Title:  post.Title,
-			Slug:   post.Slug,
-			Status: post.Status,
-			PublishedAt: func() string {
-				if post.PublishedAt.Time.IsZero() {
-					return ""
-				}
-
-				return post.PublishedAt.Time.Format(time.RFC3339)
-			}(),
+			ID: post.ID,
 			CreatedAt: func() string {
 				if post.CreatedAt.IsZero() {
 					return ""

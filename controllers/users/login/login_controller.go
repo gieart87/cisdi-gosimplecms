@@ -19,12 +19,12 @@ func NewUserLoginController(userService services.UserService) *UserLoginControll
 }
 
 // Login godoc
-// @Summary Login user
-// @Description Create a new user account
+// @Summary Login users
+// @Description Create a new users account
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param user body models.LoginRequest true "User login"
+// @Param users body models.LoginRequest true "User login"
 // @Success 200 {object} models.LoginResponse
 // @Failure 400 {object} map[string]string
 // @Router /login [post]

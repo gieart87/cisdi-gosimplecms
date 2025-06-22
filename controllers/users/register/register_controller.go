@@ -19,12 +19,12 @@ func NewUserRegisterController(userService services.UserService) *UserRegisterCo
 }
 
 // Register godoc
-// @Summary Register a new user
-// @Description Create a new user account
+// @Summary Register a new users
+// @Description Create a new users account
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param user body models.RegisterRequest true "User registration data"
+// @Param users body models.RegisterRequest true "User registration data"
 // @Success 201 {object} models.RegisterResponse
 // @Failure 400 {object} map[string]string
 // @Router /register [post]
@@ -53,5 +53,5 @@ func (uc *UserRegisterController) Register(c *gin.Context) {
 		return
 	}
 
-	response.CreatedResponse(c, uc.transformToResponse(createdUser), "successfully create user")
+	response.CreatedResponse(c, uc.transformToResponse(createdUser), "successfully create users")
 }
