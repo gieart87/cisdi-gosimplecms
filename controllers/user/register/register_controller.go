@@ -24,8 +24,8 @@ func NewUserRegisterController(userService services.UserService) *UserRegisterCo
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param user body register.Request true "User registration data"
-// @Success 201 {object} register.Response
+// @Param user body models.RegisterRequest true "User registration data"
+// @Success 201 {object} models.RegisterResponse
 // @Failure 400 {object} map[string]string
 // @Router /register [post]
 func (uc *UserRegisterController) Register(c *gin.Context) {

@@ -3,11 +3,9 @@ package login
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
+	"gosimplecms/models"
 	"gosimplecms/services"
-	"gosimplecms/utils/jwt"
-	"gosimplecms/utils/password"
+	"gosimplecms/utils/errs"
 	"gosimplecms/utils/response"
 	"net/http"
 )
@@ -26,12 +24,12 @@ func NewUserLoginController(userService services.UserService) *UserLoginControll
 // @Tags Auth
 // @Accept json
 // @Produce json
-// @Param user body login.Request true "User login"
-// @Success 200 {object} login.Response
+// @Param user body models.LoginRequest true "User login"
+// @Success 200 {object} models.LoginResponse
 // @Failure 400 {object} map[string]string
 // @Router /login [post]
 func (uc *UserLoginController) Login(c *gin.Context) {
-	var req Request
+	var req models.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.ErrorResponse(c, http.StatusBadRequest, err)
@@ -43,24 +41,16 @@ func (uc *UserLoginController) Login(c *gin.Context) {
 		return
 	}
 
-	existUser, err := uc.UserService.FindByEmail(req.Email)
-	if err != nil || !password.CheckPassword(existUser.Password, req.Password) {
-		response.ErrorResponse(c, http.StatusForbidden, errors.New("invalid email or password"))
-		return
-	}
-
-	token, err := jwt.GenerateToken(existUser.ID, existUser.Role)
+	var appErr *errs.AppError
+	token, err := uc.UserService.Login(req)
 	if err != nil {
-		response.ErrorResponse(c, http.StatusInternalServerError, errors.New("failed to generate token"))
+		if errors.As(err, &appErr) && appErr.Code == errs.ErrCodeLoginFailed {
+			response.ErrorResponse(c, http.StatusForbidden, errors.New(appErr.Message))
+			return
+		}
+		response.ErrorResponse(c, http.StatusInternalServerError, err)
 		return
 	}
 
-	response.SuccessResponse(c, token, "successfully generate token")
-}
-
-func (r Request) Validate() error {
-	return validation.ValidateStruct(&r,
-		validation.Field(&r.Email, validation.Required, validation.Length(5, 50), is.Email),
-		validation.Field(&r.Password, validation.Required, validation.Length(6, 20)),
-	)
+	response.SuccessResponse(c, uc.transformToResponse(token), "successfully generate token")
 }

@@ -8,6 +8,7 @@ import (
 	"gosimplecms/models"
 	"gosimplecms/repositories"
 	"gosimplecms/utils/errs"
+	"gosimplecms/utils/password"
 	"testing"
 )
 
@@ -69,4 +70,71 @@ func TestUserService_RegisterEmailAlreadyExist(t *testing.T) {
 	_, err := service.Register(req)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Sprintf("%s: %s", errs.ErrCodeEmailAlreadyRegistered, errs.ErrMessageEmailAlreadyRegistered), err.Error())
+}
+
+func TestUserService_LoginSuccess(t *testing.T) {
+	mockRepo := repositories.NewUserRepositoryMock()
+	plainPassword := "secret123"
+	hashedPassword := password.HashPassword(plainPassword)
+
+	mockRepo.FindByEmailFunc = func(id string) (*models.User, error) {
+		return &models.User{
+			ID:       uuid.New().String(),
+			Name:     "John",
+			Email:    "john@example.com",
+			Password: hashedPassword,
+			Role:     models.RoleUser,
+		}, nil
+	}
+
+	service := NewUserService(mockRepo)
+	token, err := service.Login(models.LoginRequest{
+		Email:    "john@example.com",
+		Password: plainPassword,
+	})
+
+	assert.Nil(t, err)
+	assert.NotEmpty(t, token)
+}
+
+func TestUserService_LoginUserNotFound(t *testing.T) {
+	mockRepo := repositories.NewUserRepositoryMock()
+
+	mockRepo.FindByEmailFunc = func(id string) (*models.User, error) {
+		return &models.User{}, nil
+	}
+
+	service := NewUserService(mockRepo)
+	_, err := service.Login(models.LoginRequest{
+		Email:    "invalid@example.com",
+		Password: "password123",
+	})
+
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Sprintf("%s: %s", errs.ErrCodeLoginFailed, errs.ErrMessageLoginFailed), err.Error())
+}
+
+func TestUserService_LoginInvalidPassword(t *testing.T) {
+	mockRepo := repositories.NewUserRepositoryMock()
+	plainPassword := "CorrectPassword"
+	hashedPassword := password.HashPassword(plainPassword)
+
+	mockRepo.FindByEmailFunc = func(id string) (*models.User, error) {
+		return &models.User{
+			ID:       uuid.New().String(),
+			Name:     "John",
+			Email:    "john@example.com",
+			Password: hashedPassword,
+			Role:     models.RoleUser,
+		}, nil
+	}
+
+	service := NewUserService(mockRepo)
+	_, err := service.Login(models.LoginRequest{
+		Email:    "john@example.com",
+		Password: "WrongPassword",
+	})
+
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Sprintf("%s: %s", errs.ErrCodeLoginFailed, errs.ErrMessageLoginFailed), err.Error())
 }

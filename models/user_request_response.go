@@ -8,7 +8,6 @@ import (
 type RegisterRequest struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
-	Role     string `json:"role"`
 	Password string `json:"password"`
 }
 
@@ -26,4 +25,20 @@ type RegisterResponse struct {
 	Email     string `json:"email"`
 	Role      string `json:"role"`
 	CreatedAt string `json:"created_at"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
+func (r LoginRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Email, validation.Required, validation.Length(5, 50), is.Email),
+		validation.Field(&r.Password, validation.Required, validation.Length(6, 20)),
+	)
 }

@@ -1,18 +1,18 @@
 basePath: /
 definitions:
-  login.Request:
+  models.LoginRequest:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  login.Response:
+  models.LoginResponse:
     properties:
       token:
         type: string
     type: object
-  register.Request:
+  models.RegisterRequest:
     properties:
       email:
         type: string
@@ -21,7 +21,7 @@ definitions:
       password:
         type: string
     type: object
-  register.Response:
+  models.RegisterResponse:
     properties:
       created_at:
         type: string
@@ -52,14 +52,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/login.Request'
+          $ref: '#/definitions/models.LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/login.Response'
+            $ref: '#/definitions/models.LoginResponse'
         "400":
           description: Bad Request
           schema:
@@ -80,14 +80,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/register.Request'
+          $ref: '#/definitions/models.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/register.Response'
+            $ref: '#/definitions/models.RegisterResponse'
         "400":
           description: Bad Request
           schema:

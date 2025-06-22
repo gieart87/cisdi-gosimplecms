@@ -29,7 +29,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/login.Request"
+                            "$ref": "#/definitions/models.LoginRequest"
                         }
                     }
                 ],
@@ -37,7 +37,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/login.Response"
+                            "$ref": "#/definitions/models.LoginResponse"
                         }
                     },
                     "400": {
@@ -72,7 +72,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/register.Request"
+                            "$ref": "#/definitions/models.RegisterRequest"
                         }
                     }
                 ],
@@ -80,7 +80,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/register.Response"
+                            "$ref": "#/definitions/models.RegisterResponse"
                         }
                     },
                     "400": {
@@ -97,7 +97,7 @@
         }
     },
     "definitions": {
-        "login.Request": {
+        "models.LoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -108,7 +108,7 @@
                 }
             }
         },
-        "login.Response": {
+        "models.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -116,7 +116,7 @@
                 }
             }
         },
-        "register.Request": {
+        "models.RegisterRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -130,7 +130,7 @@
                 }
             }
         },
-        "register.Response": {
+        "models.RegisterResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

@@ -7,12 +7,14 @@ import (
 	"gosimplecms/models"
 	"gosimplecms/repositories"
 	"gosimplecms/utils/errs"
+	"gosimplecms/utils/jwt"
 	"gosimplecms/utils/password"
 )
 
 type UserService interface {
 	GetUsers() ([]models.User, error)
 	Register(registerRequest models.RegisterRequest) (*models.User, error)
+	Login(loginRequest models.LoginRequest) (string, error)
 	FindByEmail(email string) (*models.User, error)
 }
 
@@ -34,7 +36,7 @@ func (s userService) Register(registerRequest models.RegisterRequest) (*models.U
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
-	
+
 	if existUser != nil {
 		return nil, errs.NewAppError(errs.ErrCodeEmailAlreadyRegistered, errs.ErrMessageEmailAlreadyRegistered)
 	}
@@ -44,15 +46,24 @@ func (s userService) Register(registerRequest models.RegisterRequest) (*models.U
 		Email:      registerRequest.Email,
 		VerifiedAt: sql.NullTime{},
 		Password:   password.HashPassword(registerRequest.Password),
-		Role: func() string {
-			if registerRequest.Role == "" {
-				return models.RoleUser
-			}
-			return registerRequest.Role
-		}(),
+		Role:       models.RoleUser,
 	}
 
 	return s.repo.Create(user)
+}
+
+func (s userService) Login(loginRequest models.LoginRequest) (string, error) {
+	existUser, err := s.repo.FindByEmail(loginRequest.Email)
+	if err != nil || !password.CheckPassword(existUser.Password, loginRequest.Password) {
+		return "", errs.NewAppError(errs.ErrCodeLoginFailed, errs.ErrMessageLoginFailed)
+	}
+
+	token, err := jwt.GenerateToken(existUser.ID, existUser.Role)
+	if err != nil {
+		return "", errs.NewAppError(errs.ErrCodeLoginFailed, errs.ErrMessageLoginFailed)
+	}
+
+	return token, nil
 }
 
 func (s userService) FindByEmail(email string) (*models.User, error) {

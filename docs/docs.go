@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/login.Request"
+                            "$ref": "#/definitions/models.LoginRequest"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/login.Response"
+                            "$ref": "#/definitions/models.LoginResponse"
                         }
                     },
                     "400": {
@@ -78,7 +78,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/register.Request"
+                            "$ref": "#/definitions/models.RegisterRequest"
                         }
                     }
                 ],
@@ -86,7 +86,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/register.Response"
+                            "$ref": "#/definitions/models.RegisterResponse"
                         }
                     },
                     "400": {
@@ -103,7 +103,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "login.Request": {
+        "models.LoginRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -114,7 +114,7 @@ const docTemplate = `{
                 }
             }
         },
-        "login.Response": {
+        "models.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -122,7 +122,7 @@ const docTemplate = `{
                 }
             }
         },
-        "register.Request": {
+        "models.RegisterRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -136,7 +136,7 @@ const docTemplate = `{
                 }
             }
         },
-        "register.Response": {
+        "models.RegisterResponse": {
             "type": "object",
             "properties": {
                 "created_at": {

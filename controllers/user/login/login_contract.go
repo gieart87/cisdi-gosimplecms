@@ -1,10 +1,9 @@
 package login
 
-type Request struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
+import (
+	"gosimplecms/models"
+)
 
-type Response struct {
-	Token string `json:"token"`
+func (uc *UserLoginController) transformToResponse(token string) *models.LoginResponse {
+	return &models.LoginResponse{Token: token}
 }
