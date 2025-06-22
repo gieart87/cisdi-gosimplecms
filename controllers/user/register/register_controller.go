@@ -3,9 +3,9 @@ package register
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"gosimplecms/models"
 	"gosimplecms/services"
+	"gosimplecms/utils/errs"
 	"gosimplecms/utils/response"
 	"net/http"
 )
@@ -29,7 +29,7 @@ func NewUserRegisterController(userService services.UserService) *UserRegisterCo
 // @Failure 400 {object} map[string]string
 // @Router /register [post]
 func (uc *UserRegisterController) Register(c *gin.Context) {
-	var req Request
+	var req models.RegisterRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.ErrorResponse(c, http.StatusBadRequest, err)
@@ -41,25 +41,14 @@ func (uc *UserRegisterController) Register(c *gin.Context) {
 		return
 	}
 
-	existUser, err := uc.UserService.FindByEmail(req.Email)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		response.ErrorResponse(c, http.StatusBadRequest, err)
-		return
-	}
-
-	if existUser != nil {
-		response.ErrorResponse(c, http.StatusConflict, errors.New("email already registered"))
-		return
-	}
-
-	user := models.User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: req.Password,
-	}
-
-	createdUser, err := uc.UserService.CreateUser(user)
+	var appErr *errs.AppError
+	createdUser, err := uc.UserService.Register(req)
 	if err != nil {
+		if errors.As(err, &appErr) && appErr.Code == errs.ErrCodeEmailAlreadyRegistered {
+			response.ErrorResponse(c, http.StatusConflict, errors.New(appErr.Message))
+			return
+		}
+
 		response.ErrorResponse(c, http.StatusInternalServerError, err)
 		return
 	}
