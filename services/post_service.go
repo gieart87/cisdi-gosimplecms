@@ -12,6 +12,7 @@ type PostService interface {
 	GetPosts(limit, offset int) ([]models.Post, int64, error)
 	GetActivePosts(limit, offset int, orderClause string) ([]models.Post, int64, error)
 	FindBySlug(string) (*models.Post, error)
+	FindByID(uint) (*models.Post, error)
 	Create(models.CreatePostRequest) (*models.Post, error)
 	FindCategoriesByIDs([]uint) ([]models.Category, error)
 	FindTagsByIDs([]uint) ([]models.Tag, error)
@@ -124,6 +125,10 @@ func (p postService) Create(req models.CreatePostRequest) (*models.Post, error) 
 
 func (p postService) FindBySlug(slug string) (*models.Post, error) {
 	return p.postRepository.FindBySlug(slug)
+}
+
+func (p postService) FindByID(userID uint) (*models.Post, error) {
+	return p.postRepository.FindByID(userID)
 }
 
 func (p postService) FindCategoriesByIDs(categoryIDs []uint) ([]models.Category, error) {

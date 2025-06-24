@@ -241,6 +241,39 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/posts/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Get detail post",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateUpdatePostResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/users/profile": {
             "get": {
                 "description": "Get profile user",
@@ -466,6 +499,9 @@ const docTemplate = `{
             "properties": {
                 "created_at": {
                     "type": "string"
+                },
+                "current_version_number": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"

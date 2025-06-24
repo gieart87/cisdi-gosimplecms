@@ -12,6 +12,7 @@ import (
 	adminCategoryList "gosimplecms/controllers/admin/categories/list"
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
+	"gosimplecms/controllers/posts/detail"
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
 	"gosimplecms/controllers/users/login"
@@ -77,8 +78,9 @@ func startServer(port string) {
 	userLoginController := login.NewUserLoginController(userService)
 	userProfileController := profile.NewUserProfileController(userService)
 	listPostController := list.NewListPostController(postService)
-
+	detailPostController := detail.NewDetailPostController(postService)
 	tagScoreController := tagScore.NewPostTagScoreController(postService)
+
 	adminCategoryCreateController := adminCategoryCreate.NewCategoryCreateController(categoryService)
 	adminCategoryListController := adminCategoryList.NewCategoryListController(categoryService)
 	adminPostCreateController := adminPostCreate.NewPostCreateController(postService)
@@ -89,6 +91,7 @@ func startServer(port string) {
 		userLoginController,
 		userProfileController,
 		listPostController,
+		detailPostController,
 		tagScoreController,
 		adminCategoryCreateController,
 		adminCategoryListController,

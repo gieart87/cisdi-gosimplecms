@@ -69,6 +69,8 @@ definitions:
     properties:
       created_at:
         type: string
+      current_version_number:
+        type: integer
       id:
         type: integer
       status:
@@ -248,6 +250,26 @@ paths:
       security:
       - BearerAuth: []
       summary: Get all posts
+      tags:
+      - Posts
+  /api/v1/posts/{id}:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateUpdatePostResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get detail post
       tags:
       - Posts
   /api/v1/posts/tag-scores:

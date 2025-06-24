@@ -16,7 +16,7 @@ type PostRepository interface {
 	DeleteTx(tx *gorm.DB, id uuid.UUID) error
 	GetPosts(limit, offset int) ([]models.Post, int64, error)
 	GetActivePosts(limit, offset int, orderClause string) ([]models.Post, int64, error)
-	FindByID(id uuid.UUID) (*models.Post, error)
+	FindByID(id uint) (*models.Post, error)
 	FindTagsByIDs(ids []string) ([]models.Tag, error)
 	FindCategoriesByIDs(ids []string) ([]models.Category, error)
 	DB() *gorm.DB
@@ -112,9 +112,15 @@ func (p postRepository) Create(post models.Post) (*models.Post, error) {
 	return &post, nil
 }
 
-func (p postRepository) FindByID(id uuid.UUID) (*models.Post, error) {
-	//TODO implement me
-	panic("implement me")
+func (p postRepository) FindByID(id uint) (*models.Post, error) {
+	var post models.Post
+
+	err := configs.DB.Where("id = ?", id).Take(&post).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &post, nil
 }
 
 func (p postRepository) FindBySlug(slug string) (*models.Post, error) {

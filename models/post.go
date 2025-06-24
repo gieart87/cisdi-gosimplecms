@@ -46,11 +46,12 @@ type PaginationMeta struct {
 }
 
 type CreateUpdatePostResponse struct {
-	ID        uint   `json:"id"`
-	Title     string `json:"title"`
-	Status    string `json:"status"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	ID                   uint   `json:"id"`
+	Title                string `json:"title"`
+	Status               string `json:"status"`
+	CreatedAt            string `json:"created_at"`
+	UpdatedAt            string `json:"updated_at"`
+	CurrentVersionNumber int64  `json:"current_version_number"`
 }
 
 func (r CreatePostRequest) Validate() error {

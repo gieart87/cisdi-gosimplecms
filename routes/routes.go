@@ -6,6 +6,7 @@ import (
 	adminCategoryList "gosimplecms/controllers/admin/categories/list"
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
+	"gosimplecms/controllers/posts/detail"
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
 	"gosimplecms/controllers/users/login"
@@ -22,6 +23,7 @@ func SetupRoutes(
 	userLoginController *login.UserLoginController,
 	userProfileController *profile.UserProfileController,
 	listPostsController *list.PostListController,
+	detailPostController *detail.PostDetailController,
 	tagScorePostController *tagScore.PostTagScoreController,
 	adminCategoryCreateController *adminCategoryCreate.CategoryCreateController,
 	adminCategoryListController *adminCategoryList.CategoryListController,
@@ -47,6 +49,7 @@ func SetupRoutes(
 	apiV1Posts := apiV1.Group("/posts")
 	{
 		apiV1Posts.GET("", listPostsController.GetPosts)
+		apiV1Posts.GET("/:id", detailPostController.Show)
 		apiV1Posts.GET("/tag-scores", tagScorePostController.GetScores)
 	}
 
