@@ -10,7 +10,7 @@ import (
 
 type PostService interface {
 	GetPosts(limit, offset int) ([]models.Post, int64, error)
-	GetActivePosts(limit, offset int) ([]models.Post, int64, error)
+	GetActivePosts(limit, offset int, orderClause string) ([]models.Post, int64, error)
 	FindBySlug(string) (*models.Post, error)
 	Create(models.CreatePostRequest) (*models.Post, error)
 	FindCategoriesByIDs([]uint) ([]models.Category, error)
@@ -36,8 +36,8 @@ func (p postService) GetPosts(limit, offset int) ([]models.Post, int64, error) {
 	return p.postRepository.GetPosts(limit, offset)
 }
 
-func (p postService) GetActivePosts(limit, offset int) ([]models.Post, int64, error) {
-	return p.postRepository.GetActivePosts(limit, offset)
+func (p postService) GetActivePosts(limit, offset int, orderClause string) ([]models.Post, int64, error) {
+	return p.postRepository.GetActivePosts(limit, offset, orderClause)
 }
 
 func (p postService) GetTagRelationshipScores() ([]models.TagRelationship, error) {

@@ -32,7 +32,14 @@ func (ctl *PostListController) GetPosts(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
 	offset := (page - 1) * limit
 
-	posts, total, err := ctl.PostService.GetActivePosts(limit, offset)
+	// Optional sort param (default: created_at desc)
+	sort := c.DefaultQuery("sort", "created_at_desc")
+	orderClause := "created_at desc"
+	if sort == "created_at_asc" {
+		orderClause = "created_at asc"
+	}
+
+	posts, total, err := ctl.PostService.GetActivePosts(limit, offset, orderClause)
 	if err != nil {
 		response.ErrorResponse(c, http.StatusInternalServerError, err)
 	}

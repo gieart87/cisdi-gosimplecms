@@ -15,7 +15,7 @@ type PostRepository interface {
 	UpdateTx(tx *gorm.DB, post *models.Post) (*models.Post, error)
 	DeleteTx(tx *gorm.DB, id uuid.UUID) error
 	GetPosts(limit, offset int) ([]models.Post, int64, error)
-	GetActivePosts(limit, offset int) ([]models.Post, int64, error)
+	GetActivePosts(limit, offset int, orderClause string) ([]models.Post, int64, error)
 	FindByID(id uuid.UUID) (*models.Post, error)
 	FindTagsByIDs(ids []string) ([]models.Tag, error)
 	FindCategoriesByIDs(ids []string) ([]models.Category, error)
@@ -59,13 +59,14 @@ func (p postRepository) GetPosts(limit, offset int) ([]models.Post, int64, error
 	return posts, total, nil
 }
 
-func (p postRepository) GetActivePosts(limit, offset int) ([]models.Post, int64, error) {
+func (p postRepository) GetActivePosts(limit, offset int, orderClause string) ([]models.Post, int64, error) {
 	var posts []models.Post
 	var total int64
 
 	configs.DB.Model(&models.Post{}).Where("status = ?", models.PostStatusPublished).Count(&total)
 	configs.DB.Preload("Categories").Preload("Tags").
 		Where("status = ?", models.PostStatusPublished).Find(&posts).
+		Order(orderClause).
 		Limit(limit).Offset(offset).Find(&posts)
 
 	return posts, total, nil
