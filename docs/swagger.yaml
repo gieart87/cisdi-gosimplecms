@@ -272,6 +272,27 @@ paths:
       summary: Get tag scores
       tags:
       - Posts
+  /api/v1/users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get profile user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RegisterResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Profile user
+      tags:
+      - Auth
   /login:
     post:
       consumes:

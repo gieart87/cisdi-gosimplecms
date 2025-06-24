@@ -15,6 +15,7 @@ import (
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
 	"gosimplecms/controllers/users/login"
+	"gosimplecms/controllers/users/profile"
 	"gosimplecms/controllers/users/register"
 	"gosimplecms/db/seeds"
 	_ "gosimplecms/docs"
@@ -74,6 +75,7 @@ func startServer(port string) {
 
 	userRegisterController := register.NewUserRegisterController(userService)
 	userLoginController := login.NewUserLoginController(userService)
+	userProfileController := profile.NewUserProfileController(userService)
 	listPostController := list.NewListPostController(postService)
 
 	tagScoreController := tagScore.NewPostTagScoreController(postService)
@@ -85,6 +87,7 @@ func startServer(port string) {
 	routes.SetupRoutes(r,
 		userRegisterController,
 		userLoginController,
+		userProfileController,
 		listPostController,
 		tagScoreController,
 		adminCategoryCreateController,

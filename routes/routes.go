@@ -9,6 +9,7 @@ import (
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
 	"gosimplecms/controllers/users/login"
+	"gosimplecms/controllers/users/profile"
 	"gosimplecms/controllers/users/register"
 	"gosimplecms/middlewares"
 	"gosimplecms/models"
@@ -19,6 +20,7 @@ func SetupRoutes(
 
 	userRegisterController *register.UserRegisterController,
 	userLoginController *login.UserLoginController,
+	userProfileController *profile.UserProfileController,
 	listPostsController *list.PostListController,
 	tagScorePostController *tagScore.PostTagScoreController,
 	adminCategoryCreateController *adminCategoryCreate.CategoryCreateController,
@@ -37,10 +39,15 @@ func SetupRoutes(
 
 	apiV1 := api.Group("/v1")
 
+	apiV1Users := apiV1.Group("/users")
+	{
+		apiV1Users.GET("/profile", userProfileController.Profile)
+	}
+
 	apiV1Posts := apiV1.Group("/posts")
 	{
 		apiV1Posts.GET("", listPostsController.GetPosts)
-		apiV1Posts.GET("tag-scores", tagScorePostController.GetScores)
+		apiV1Posts.GET("/tag-scores", tagScorePostController.GetScores)
 	}
 
 	// Admin only routes

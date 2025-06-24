@@ -16,6 +16,7 @@ type UserService interface {
 	Register(registerRequest models.RegisterRequest) (*models.User, error)
 	Login(loginRequest models.LoginRequest) (string, error)
 	FindByEmail(email string) (*models.User, error)
+	FindByID(id uint) (*models.User, error)
 }
 
 type userService struct {
@@ -68,4 +69,8 @@ func (s userService) Login(loginRequest models.LoginRequest) (string, error) {
 
 func (s userService) FindByEmail(email string) (*models.User, error) {
 	return s.repo.FindByEmail(email)
+}
+
+func (s userService) FindByID(id uint) (*models.User, error) {
+	return s.repo.FindByID(id)
 }

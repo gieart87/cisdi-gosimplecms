@@ -8,7 +8,7 @@ import (
 type UserRepository interface {
 	GetAll() ([]models.User, error)
 	Create(user models.User) (*models.User, error)
-	FindByID(id string) (*models.User, error)
+	FindByID(id uint) (*models.User, error)
 	FindByEmail(email string) (*models.User, error)
 	Update(user models.User) (*models.User, error)
 }
@@ -31,11 +31,11 @@ func (u userRepository) Create(user models.User) (*models.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &user, nil
 }
 
-func (u userRepository) FindByID(id string) (*models.User, error) {
+func (u userRepository) FindByID(id uint) (*models.User, error) {
 	var user models.User
 	err := configs.DB.Take(&user, id).Error
 	if err != nil {
