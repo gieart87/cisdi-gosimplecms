@@ -9,7 +9,7 @@ import (
 
 var DB *gorm.DB
 
-func ConnectDatabase() {
+func ConnectDatabase() *gorm.DB {
 	var err error
 
 	dbHost := env.GetEnv("DB_HOST", "localhost")
@@ -25,4 +25,6 @@ func ConnectDatabase() {
 	}
 
 	DB = database
+
+	return DB
 }

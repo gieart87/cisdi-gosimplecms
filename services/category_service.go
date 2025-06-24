@@ -3,7 +3,6 @@ package services
 import (
 	"gosimplecms/models"
 	"gosimplecms/repositories"
-	"gosimplecms/utils/slug"
 )
 
 type CategoryService interface {
@@ -23,7 +22,6 @@ func NewCategoryService(categoryRepository repositories.CategoryRepository) Cate
 func (c categoryService) Create(req models.CreateCategoryRequest) (*models.Category, error) {
 	category := models.Category{
 		Name: req.Name,
-		Slug: slug.GenerateUniqueSlug(req.Name),
 	}
 
 	return c.categoryRepository.Create(category)

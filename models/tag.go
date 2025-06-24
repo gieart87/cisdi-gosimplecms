@@ -1,13 +1,19 @@
 package models
 
-import "time"
+import (
+	"github.com/gosimple/slug"
+	"gorm.io/gorm"
+)
 
 type Tag struct {
-	ID           string        `gorm:"size:36;not null;uniqueIndex;primary_key"`
-	PostVersions []PostVersion `gorm:"many2many:post_version_tags;"`
-	Name         string        `gorm:"size:255;not null;"`
-	Slug         string        `gorm:"size:255;not null;uniqueIndex"`
-	UsageCount   int           `gorm:"default:0"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	gorm.Model
+	Name       string `json:"name"`
+	Slug       string `gorm:"size:255;not null;uniqueIndex"`
+	Posts      []Post `gorm:"many2many:post_tags"`
+	UsageCount int64  `json:"usage_count;default:0"`
+}
+
+func (p *Tag) BeforeCreate(tx *gorm.DB) (err error) {
+	p.Slug = slug.Make(p.Name)
+	return
 }

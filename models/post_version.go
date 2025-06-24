@@ -1,17 +1,23 @@
 package models
 
-import "database/sql"
+import (
+	"github.com/gosimple/slug"
+	"gorm.io/gorm"
+)
 
 type PostVersion struct {
-	ID          string `gorm:"size:36;not null;uniqueIndex;primary_key"`
-	Post        Post
-	PostID      string       `gorm:"size:36;index"`
-	VersionID   string       `gorm:"size:255;uniqueIndex"`
-	Categories  []Category   `gorm:"many2many:post_version_categories;"`
-	Tags        []Tag        `gorm:"many2many:post_version_tags;"`
-	Title       string       `gorm:"size:255"`
-	Slug        string       `gorm:"size:255;uniqueIndex"`
-	Body        string       `gorm:"type:text"`
-	Status      string       `gorm:"size:20;not null;index;default:'DRAFT'"`
-	PublishedAt sql.NullTime `gorm:"index"`
+	gorm.Model
+	Title      string `json:"title"`
+	Slug       string `gorm:"size:255;not null;uniqueIndex"`
+	Status     string `gorm:"size:20;not null;index;default:'DRAFT'"`
+	Content    string `json:"content"`
+	PostID     uint
+	Post       Post
+	Categories []Category `gorm:"many2many:post_version_categories;" json:"categories"`
+	Tags       []Tag      `gorm:"many2many:post_version_tags;" json:"tags"`
+}
+
+func (p *PostVersion) BeforeCreate(tx *gorm.DB) (err error) {
+	p.Slug = slug.Make(p.Title)
+	return nil
 }

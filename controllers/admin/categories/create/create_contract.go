@@ -8,6 +8,5 @@ func (ctl *CategoryCreateController) transformToResponse(category *models.Catego
 	return &models.CreateUpdateCategoryResponse{
 		ID:   category.ID,
 		Name: category.Name,
-		Slug: category.Slug,
 	}
 }

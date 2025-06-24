@@ -10,6 +10,8 @@ import (
 	"gosimplecms/configs"
 	adminCategoryCreate "gosimplecms/controllers/admin/categories/create"
 	adminCategoryList "gosimplecms/controllers/admin/categories/list"
+	adminPostCreate "gosimplecms/controllers/admin/posts/create"
+	adminPostList "gosimplecms/controllers/admin/posts/list"
 	"gosimplecms/controllers/posts/list"
 	"gosimplecms/controllers/users/login"
 	"gosimplecms/controllers/users/register"
@@ -55,21 +57,25 @@ func startServer(port string) {
 
 	//gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-	configs.ConnectDatabase()
+	db := configs.ConnectDatabase()
 
 	userRepo := repositories.NewUserRepository()
+	postRepo := repositories.NewPostRepository(db)
+	tagRepo := repositories.NewTagRepository()
+	categoryRepo := repositories.NewCategoryRepository()
+
 	userService := services.NewUserService(userRepo)
+	postService := services.NewPostService(postRepo, tagRepo, categoryRepo)
+	categoryService := services.NewCategoryService(categoryRepo)
+
 	userRegisterController := register.NewUserRegisterController(userService)
 	userLoginController := login.NewUserLoginController(userService)
-
-	postRepo := repositories.NewPostRepository()
-	postService := services.NewPostService(postRepo)
 	listPostController := list.NewListPostController(postService)
 
-	categoryRepo := repositories.NewCategoryRepository()
-	categoryService := services.NewCategoryService(categoryRepo)
 	adminCategoryCreateController := adminCategoryCreate.NewCategoryCreateController(categoryService)
 	adminCategoryListController := adminCategoryList.NewCategoryListController(categoryService)
+	adminPostCreateController := adminPostCreate.NewPostCreateController(postService)
+	adminPostListController := adminPostList.NewPostListController(postService)
 
 	routes.SetupRoutes(r,
 		userRegisterController,
@@ -77,6 +83,8 @@ func startServer(port string) {
 		listPostController,
 		adminCategoryCreateController,
 		adminCategoryListController,
+		adminPostCreateController,
+		adminPostListController,
 	)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -87,13 +95,7 @@ func startServer(port string) {
 func runMigration() {
 	configs.ConnectDatabase()
 
-	err := configs.DB.AutoMigrate(
-		&models.User{},
-		&models.Category{},
-		&models.Tag{},
-		&models.Post{},
-		&models.PostVersion{},
-	)
+	err := configs.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.PostVersion{}, &models.Category{}, &models.Tag{})
 	if err != nil {
 		log.Fatal("❌ Migration failed:", err)
 	}

@@ -7,6 +7,23 @@ definitions:
       slug:
         type: string
     type: object
+  models.CreatePostRequest:
+    properties:
+      body:
+        type: string
+      category_ids:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
   models.CreateUpdateCategoryResponse:
     properties:
       id:
@@ -14,6 +31,19 @@ definitions:
       name:
         type: string
       slug:
+        type: string
+    type: object
+  models.CreateUpdatePostResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
         type: string
     type: object
   models.LoginRequest:
@@ -106,6 +136,34 @@ paths:
       summary: Create a new category
       tags:
       - Manage Categories
+  /api/v1/admin/posts:
+    post:
+      consumes:
+      - application/json
+      description: Create a new post
+      parameters:
+      - description: Post data
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CreateUpdatePostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new post
+      tags:
+      - Manage Posts
   /login:
     post:
       consumes:

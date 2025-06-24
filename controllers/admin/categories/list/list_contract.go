@@ -6,7 +6,8 @@ import (
 )
 
 type Category struct {
-	ID        string `json:"id"`
+	ID        uint   `json:"id"`
+	Name      string `json:"name,omitempty"`
 	Slug      string `json:"slug,omitempty"`
 	CreatedAt string `json:"created_at,omitempty"`
 }
@@ -22,6 +23,7 @@ func (ctl *CategoryListController) transformToResponse(categories []models.Categ
 	for _, category := range categories {
 		categoryList = append(categoryList, &Category{
 			ID:        category.ID,
+			Name:      category.Name,
 			Slug:      category.Slug,
 			CreatedAt: category.CreatedAt.Format(time.RFC3339),
 		})

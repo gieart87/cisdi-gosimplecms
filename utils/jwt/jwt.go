@@ -9,12 +9,12 @@ import (
 var jwtSecret = []byte(env.GetEnv("JWT_SECRET", ""))
 
 type JWTClaim struct {
-	UserID string
+	UserID uint
 	Role   string
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(userID string, role string) (string, error) {
+func GenerateToken(userID uint, role string) (string, error) {
 	claims := JWTClaim{
 		UserID: userID,
 		Role:   role,

@@ -10,7 +10,7 @@ type Response struct {
 }
 
 type Post struct {
-	ID          string `json:"id"`
+	ID          uint   `json:"id"`
 	Title       string `json:"title,omitempty"`
 	Slug        string `json:"slug,omitempty"`
 	Status      string `json:"status,omitempty"`

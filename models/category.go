@@ -1,23 +1,42 @@
 package models
 
 import (
-	"github.com/google/uuid"
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/gosimple/slug"
 	"gorm.io/gorm"
-	"time"
 )
 
 type Category struct {
-	ID           string        `gorm:"size:36;not null;uniqueIndex;primary_key"`
-	PostVersions []PostVersion `gorm:"many2many:post_version_categories;"`
-	Name         string        `gorm:"size:255;not null;"`
-	Slug         string        `gorm:"size:255;not null;uniqueIndex"`
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	gorm.Model
+	Name  string `json:"name"`
+	Slug  string `gorm:"size:255;not null;uniqueIndex"`
+	Posts []Post `gorm:"many2many:post_categories"`
 }
 
-func (u *Category) BeforeCreate(tx *gorm.DB) error {
-	if u.ID == "" {
-		u.ID = uuid.New().String()
-	}
+func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
+	c.Slug = slug.Make(c.Name)
 	return nil
+}
+
+type CreateCategoryRequest struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+type UpdateCategoryRequest struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+type CreateUpdateCategoryResponse struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+func (r CreateCategoryRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Name, validation.Required, validation.RuneLength(3, 100)),
+	)
 }

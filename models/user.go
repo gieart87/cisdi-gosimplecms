@@ -2,21 +2,18 @@ package models
 
 import (
 	"database/sql"
-	"github.com/google/uuid"
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
 	"gorm.io/gorm"
-	"time"
 )
 
 type User struct {
-	ID         string       `gorm:"size:36;not null;uniqueIndex;primary_key"`
+	gorm.Model
 	Name       string       `gorm:"size:100;not null"`
 	Email      string       `gorm:"size:100;not null;uniqueIndex"`
 	VerifiedAt sql.NullTime `gorm:"index"`
 	Password   string       `gorm:"size:255;not null"`
 	Role       string       `gorm:"size:20;not null;index;default:'USER'"`
-	CreatedAt  time.Time    `gorm:"index"`
-	UpdatedAt  time.Time    `gorm:"index"`
-	DeletedAt  gorm.DeletedAt
 }
 
 const (
@@ -26,9 +23,40 @@ const (
 	RoleAdmin  = "ADMIN"
 )
 
-func (u *User) BeforeCreate(tx *gorm.DB) error {
-	if u.ID == "" {
-		u.ID = uuid.New().String()
-	}
-	return nil
+type RegisterRequest struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (r RegisterRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Name, validation.Required, validation.RuneLength(3, 100)),
+		validation.Field(&r.Email, validation.Required, validation.Length(5, 50), is.Email),
+		validation.Field(&r.Password, validation.Required, validation.Length(6, 20)),
+	)
+}
+
+type RegisterResponse struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Role      string `json:"role"`
+	CreatedAt string `json:"created_at"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
+func (r LoginRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Email, validation.Required, validation.Length(5, 50), is.Email),
+		validation.Field(&r.Password, validation.Required, validation.Length(6, 20)),
+	)
 }
