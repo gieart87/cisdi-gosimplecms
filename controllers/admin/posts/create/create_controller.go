@@ -37,6 +37,11 @@ func (ctl *PostCreateController) Create(c *gin.Context) {
 		return
 	}
 
+	if err := createPostRequest.Validate(); err != nil {
+		response.ErrorResponse(c, http.StatusUnprocessableEntity, err)
+		return
+	}
+
 	userID, exist := c.Get("UserID")
 	if !exist {
 		response.ErrorResponse(c, http.StatusForbidden, errors.New("invalid user"))
