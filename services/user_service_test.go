@@ -2,7 +2,6 @@ package services
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 	"gosimplecms/models"
@@ -27,7 +26,7 @@ func TestUserService_RegisterSuccess(t *testing.T) {
 	}
 
 	mockRepo.CreateFunc = func(user models.User) (*models.User, error) {
-		user.ID = uuid.New().String()
+		user.ID = 1
 		return &user, nil
 	}
 
@@ -50,7 +49,6 @@ func TestUserService_RegisterEmailAlreadyExist(t *testing.T) {
 	mockRepo := repositories.NewUserRepositoryMock()
 
 	existingUser := models.User{
-		ID:    uuid.New().String(),
 		Name:  "Alice",
 		Email: "alice@example.com",
 	}
@@ -79,7 +77,6 @@ func TestUserService_LoginSuccess(t *testing.T) {
 
 	mockRepo.FindByEmailFunc = func(id string) (*models.User, error) {
 		return &models.User{
-			ID:       uuid.New().String(),
 			Name:     "John",
 			Email:    "john@example.com",
 			Password: hashedPassword,
@@ -121,7 +118,6 @@ func TestUserService_LoginInvalidPassword(t *testing.T) {
 
 	mockRepo.FindByEmailFunc = func(id string) (*models.User, error) {
 		return &models.User{
-			ID:       uuid.New().String(),
 			Name:     "John",
 			Email:    "john@example.com",
 			Password: hashedPassword,

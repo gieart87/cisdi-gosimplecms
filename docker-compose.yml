@@ -1,0 +1,30 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      DB_DSN: "user:password@tcp(db:3306)/gosimplecmsdb?charset=utf8mb4&parseTime=True&loc=Local"
+      MODE: migrate
+
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_DATABASE: gosimplecmsdb
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: user
+      DB_PASS: password
+      DB_NAME: gosimplecmsdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+volumes:
+  dbdata:

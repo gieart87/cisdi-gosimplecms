@@ -15,6 +15,7 @@ import (
 	"gosimplecms/controllers/posts/list"
 	"gosimplecms/controllers/users/login"
 	"gosimplecms/controllers/users/register"
+	"gosimplecms/db/seeds"
 	_ "gosimplecms/docs"
 	"gosimplecms/models"
 	"gosimplecms/repositories"
@@ -104,6 +105,9 @@ func runMigration() {
 
 func runSeeder() {
 	configs.ConnectDatabase()
-	// TODO: Add your seeding logic here
-	fmt.Println("✅ Seeder executed (placeholder)")
+	err := seeds.SeedUsers(configs.DB)
+	if err != nil {
+		log.Fatal("Run SeedUsers failed:", err)
+	}
+	fmt.Println("✅ Seeder executed")
 }

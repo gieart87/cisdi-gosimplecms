@@ -5,6 +5,9 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gosimplecms/utils/env"
+	"log"
+	"os"
+	"time"
 )
 
 var DB *gorm.DB
@@ -18,13 +21,24 @@ func ConnectDatabase() *gorm.DB {
 	dbPass := env.GetEnv("DB_PASS", "root")
 	dbName := env.GetEnv("DB_NAME", "gosimplecms")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
-	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(fmt.Sprintf("failed to connect database: %v", err))
+	dsn := os.Getenv("DB_DSN")
+	if dsn == "" {
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			dbUser, dbPass, dbHost, dbPort, dbName)
 	}
 
-	DB = database
+	for i := 0; i < 10; i++ {
+		database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		if err == nil {
+			DB = database
+			fmt.Println("Connected to DB!")
+			return DB
+		}
+		log.Printf("Retry DB connection... (%d/10): %v", i+1, err)
+		time.Sleep(2 * time.Second)
+	}
+
+	log.Fatalf("Failed to connect database after retries: %v", err)
 
 	return DB
 }
