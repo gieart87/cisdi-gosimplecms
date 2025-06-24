@@ -10,6 +10,25 @@ definitions:
         type: string
       slug:
         type: string
+      status:
+        type: string
+    type: object
+  gosimplecms_controllers_posts_list.Post:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      published_at:
+        type: string
+      slug:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
     type: object
   models.CreateCategoryRequest:
     properties:
@@ -92,6 +111,17 @@ definitions:
         type: string
       role:
         type: string
+    type: object
+  models.TagRelationship:
+    properties:
+      coOccurrenceCount:
+        type: integer
+      score:
+        type: number
+      tag1ID:
+        type: integer
+      tag2ID:
+        type: integer
     type: object
 host: localhost:8080
 info:
@@ -198,6 +228,50 @@ paths:
       summary: Create a new post
       tags:
       - Manage Posts
+  /api/v1/posts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/gosimplecms_controllers_posts_list.Post'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all posts
+      tags:
+      - Posts
+  /api/v1/posts/tag-scores:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TagRelationship'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get tag scores
+      tags:
+      - Posts
   /login:
     post:
       consumes:

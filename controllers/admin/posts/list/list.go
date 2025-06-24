@@ -55,5 +55,5 @@ func (ctl *PostListController) GetPosts(c *gin.Context) {
 		Pagination: paginationMeta,
 	}
 
-	response.SuccessResponse(c, postResponse, "successfully retrieve categories")
+	response.SuccessResponse(c, postResponse, "successfully retrieve posts")
 }

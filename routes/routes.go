@@ -7,6 +7,7 @@ import (
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
 	"gosimplecms/controllers/posts/list"
+	tagScore "gosimplecms/controllers/posts/tagscore"
 	"gosimplecms/controllers/users/login"
 	"gosimplecms/controllers/users/register"
 	"gosimplecms/middlewares"
@@ -19,10 +20,12 @@ func SetupRoutes(
 	userRegisterController *register.UserRegisterController,
 	userLoginController *login.UserLoginController,
 	listPostsController *list.PostListController,
+	tagScorePostController *tagScore.PostTagScoreController,
 	adminCategoryCreateController *adminCategoryCreate.CategoryCreateController,
 	adminCategoryListController *adminCategoryList.CategoryListController,
 	adminPostCreateController *adminPostCreate.PostCreateController,
 	adminPostListController *adminPostList.PostListController,
+
 ) {
 
 	r.POST("/register", userRegisterController.Register)
@@ -33,6 +36,12 @@ func SetupRoutes(
 	api.Use(middlewares.JWTAuthMiddleware())
 
 	apiV1 := api.Group("/v1")
+
+	apiV1Posts := apiV1.Group("/posts")
+	{
+		apiV1Posts.GET("", listPostsController.GetPosts)
+		apiV1Posts.GET("tag-scores", tagScorePostController.GetScores)
+	}
 
 	// Admin only routes
 	adminV1 := apiV1.Group("/admin")

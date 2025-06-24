@@ -8,14 +8,22 @@ import (
 
 type Post struct {
 	gorm.Model
-	Title            string     `json:"title"`
-	Slug             string     `gorm:"size:255;not null;uniqueIndex"`
-	Status           string     `gorm:"size:20;not null;index;default:'DRAFT'"`
-	CurrentVersionID uint       `json:"current_version_id"`
-	Content          string     `json:"content"`
-	Categories       []Category `gorm:"many2many:post_categories" json:"categories"`
-	Tags             []Tag      `gorm:"many2many:post_tags" json:"tags"`
+	Title                string `json:"title"`
+	Slug                 string `gorm:"size:255;not null;uniqueIndex"`
+	Status               string `gorm:"size:20;not null;index;default:'DRAFT'"`
+	CurrentVersionNumber int64  `json:"current_version_number"`
+	Content              string `json:"content"`
+	UserID               uint   `json:"user_id"`
+	User                 User
+	Categories           []Category `gorm:"many2many:post_categories" json:"categories"`
+	Tags                 []Tag      `gorm:"many2many:post_tags" json:"tags"`
 }
+
+const (
+	PostStatusPublished = "PUBLISHED"
+	PostStatusDraft     = "DRAFT"
+	PostStatusArchived  = "ARCHIVED"
+)
 
 func (p *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	p.Slug = slug.Make(p.Title)

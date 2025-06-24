@@ -13,6 +13,7 @@ import (
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
 	"gosimplecms/controllers/posts/list"
+	tagScore "gosimplecms/controllers/posts/tagscore"
 	"gosimplecms/controllers/users/login"
 	"gosimplecms/controllers/users/register"
 	"gosimplecms/db/seeds"
@@ -38,7 +39,7 @@ func main() {
 		panic("Error loading .env file")
 	}
 
-	mode := flag.String("mode", "serve", "Mode to run: serve | migrate | seed")
+	mode := flag.String("mode", "serve", "Mode to run: serve | migrate | seed | score")
 	port := flag.String("port", "8080", "Port to run server on")
 	flag.Parse()
 
@@ -49,6 +50,8 @@ func main() {
 		runMigration()
 	case "seed":
 		runSeeder()
+	case "score":
+		runScoreSeeder()
 	default:
 		fmt.Println("Unknown mode:", *mode)
 	}
@@ -73,6 +76,7 @@ func startServer(port string) {
 	userLoginController := login.NewUserLoginController(userService)
 	listPostController := list.NewListPostController(postService)
 
+	tagScoreController := tagScore.NewPostTagScoreController(postService)
 	adminCategoryCreateController := adminCategoryCreate.NewCategoryCreateController(categoryService)
 	adminCategoryListController := adminCategoryList.NewCategoryListController(categoryService)
 	adminPostCreateController := adminPostCreate.NewPostCreateController(postService)
@@ -82,6 +86,7 @@ func startServer(port string) {
 		userRegisterController,
 		userLoginController,
 		listPostController,
+		tagScoreController,
 		adminCategoryCreateController,
 		adminCategoryListController,
 		adminPostCreateController,
@@ -96,7 +101,7 @@ func startServer(port string) {
 func runMigration() {
 	configs.ConnectDatabase()
 
-	err := configs.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.PostVersion{}, &models.Category{}, &models.Tag{})
+	err := configs.DB.AutoMigrate(&models.User{}, &models.Post{}, &models.PostVersion{}, &models.Category{}, &models.Tag{}, &models.TagRelationship{})
 	if err != nil {
 		log.Fatal("❌ Migration failed:", err)
 	}
@@ -108,6 +113,15 @@ func runSeeder() {
 	err := seeds.SeedUsers(configs.DB)
 	if err != nil {
 		log.Fatal("Run SeedUsers failed:", err)
+	}
+	fmt.Println("✅ Seeder executed")
+}
+
+func runScoreSeeder() {
+	configs.ConnectDatabase()
+	err := seeds.SeedTagRelationships(configs.DB)
+	if err != nil {
+		log.Fatal("Run Score Seeder failed:", err)
 	}
 	fmt.Println("✅ Seeder executed")
 }

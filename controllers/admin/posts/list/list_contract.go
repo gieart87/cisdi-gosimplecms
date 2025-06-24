@@ -9,6 +9,7 @@ type Post struct {
 	ID        uint   `json:"id"`
 	Title     string `json:"name,omitempty"`
 	Slug      string `json:"slug,omitempty"`
+	Status    string `json:"status,omitempty"`
 	CreatedAt string `json:"created_at,omitempty"`
 }
 
@@ -25,6 +26,7 @@ func (ctl *PostListController) transformToResponse(posts []models.Post) []*Post 
 			ID:        post.ID,
 			Title:     post.Title,
 			Slug:      post.Slug,
+			Status:    post.Status,
 			CreatedAt: post.CreatedAt.Format(time.RFC3339),
 		})
 	}

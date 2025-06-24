@@ -19,33 +19,23 @@ type Post struct {
 	UpdatedAt   string `json:"updated_at,omitempty"`
 }
 
-func (ctl *PostListController) transformToResponse(posts []models.Post) *Response {
-	var response Response
+func (ctl *PostListController) transformToResponse(posts []models.Post) []*Post {
+	var postList []*Post
 
 	if len(posts) == 0 {
-		response.Data = make([]*Post, 0)
-		return &response
+		postList = make([]*Post, 0)
+		return postList
 	}
 
 	for _, post := range posts {
-		response.Data = append(response.Data, &Post{
-			ID: post.ID,
-			CreatedAt: func() string {
-				if post.CreatedAt.IsZero() {
-					return ""
-				}
-
-				return post.CreatedAt.Format(time.RFC3339)
-			}(),
-			UpdatedAt: func() string {
-				if post.UpdatedAt.IsZero() {
-					return ""
-				}
-
-				return post.UpdatedAt.Format(time.RFC3339)
-			}(),
+		postList = append(postList, &Post{
+			ID:        post.ID,
+			Title:     post.Title,
+			Slug:      post.Slug,
+			Status:    post.Status,
+			CreatedAt: post.CreatedAt.Format(time.RFC3339),
 		})
 	}
 
-	return &response
+	return postList
 }

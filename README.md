@@ -16,6 +16,11 @@ Clone this code, open terminal, go to your working directory, and run these foll
 #### Run the application server
 `go run main.go` or `go run main.go --mode=serve`
 
+## Updating Tag Score Relationship
+Since the scoring flow is a heavy process, then we provide CLI command to run the process
+
+`go run main.go --mode=score`
+
 ## API Documentation
 Open this url: `http://localhost:8080/swagger/index.html` on your browser
 

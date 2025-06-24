@@ -19,25 +19,41 @@ func NewListPostController(postService services.PostService) *PostListController
 	}
 }
 
+// GetPosts godoc
+// @Summary Get all posts
+// @Tags Posts
+// @Security BearerAuth
+// @Produce json
+// @Success 200 {array} Post
+// @Failure 401 {object} map[string]string
+// @Router /api/v1/posts [get]
 func (ctl *PostListController) GetPosts(c *gin.Context) {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	limit, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
 	offset := (page - 1) * limit
 
-	posts, total, err := ctl.PostService.GetPosts(limit, offset)
+	posts, total, err := ctl.PostService.GetActivePosts(limit, offset)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		response.ErrorResponse(c, http.StatusInternalServerError, err)
 	}
 
 	if len(posts) == 0 {
 		posts = make([]models.Post, 0)
 	}
 
-	_ = models.PaginationMeta{
+	paginationMeta := models.PaginationMeta{
 		Total: total,
-		Page:  0,
-		Limit: 0,
+		Page:  page,
+		Limit: limit,
 	}
 
-	response.SuccessResponse(c, posts, "successfully retrieve posts")
+	postResponse := struct {
+		Posts      []*Post               `json:"posts"`
+		Pagination models.PaginationMeta `json:"pagination"`
+	}{
+		Posts:      ctl.transformToResponse(posts),
+		Pagination: paginationMeta,
+	}
+
+	response.SuccessResponse(c, postResponse, "successfully retrieve posts")
 }

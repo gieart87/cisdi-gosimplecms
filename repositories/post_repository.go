@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gosimplecms/configs"
@@ -14,10 +15,13 @@ type PostRepository interface {
 	UpdateTx(tx *gorm.DB, post *models.Post) (*models.Post, error)
 	DeleteTx(tx *gorm.DB, id uuid.UUID) error
 	GetPosts(limit, offset int) ([]models.Post, int64, error)
+	GetActivePosts(limit, offset int) ([]models.Post, int64, error)
 	FindByID(id uuid.UUID) (*models.Post, error)
 	FindTagsByIDs(ids []string) ([]models.Tag, error)
 	FindCategoriesByIDs(ids []string) ([]models.Category, error)
 	DB() *gorm.DB
+	GenerateSequentialNumber(postID uint) int64
+	UpdateVersion(postID uint, versionNumber int64) error
 }
 
 type postRepository struct {
@@ -50,6 +54,18 @@ func (p postRepository) GetPosts(limit, offset int) ([]models.Post, int64, error
 
 	configs.DB.Model(&models.Post{}).Count(&total)
 	configs.DB.Preload("Categories").Preload("Tags").
+		Limit(limit).Offset(offset).Find(&posts)
+
+	return posts, total, nil
+}
+
+func (p postRepository) GetActivePosts(limit, offset int) ([]models.Post, int64, error) {
+	var posts []models.Post
+	var total int64
+
+	configs.DB.Model(&models.Post{}).Where("status = ?", models.PostStatusPublished).Count(&total)
+	configs.DB.Preload("Categories").Preload("Tags").
+		Where("status = ?", models.PostStatusPublished).Find(&posts).
 		Limit(limit).Offset(offset).Find(&posts)
 
 	return posts, total, nil
@@ -114,4 +130,31 @@ func (p postRepository) FindBySlug(slug string) (*models.Post, error) {
 func (p postRepository) Update(post models.Post) (*models.Post, error) {
 	//TODO implement me
 	panic("implement me")
+}
+
+// GenerateSequentialNumber generates a number like POST-000001
+func (p postRepository) GenerateSequentialNumber(postID uint) int64 {
+	var version models.PostVersion
+
+	err := configs.DB.
+		Where("post_id = ?", postID).
+		Order("version_number desc").
+		Take(&version).Error
+	if err != nil || errors.Is(err, gorm.ErrRecordNotFound) {
+		return 1
+	}
+
+	return version.VersionNumber + 1
+}
+
+func (p postRepository) UpdateVersion(postID uint, versionNumber int64) error {
+	var post models.Post
+	err := configs.DB.Model(&post).
+		Where("id = ?", postID).
+		Update("current_version_number", versionNumber).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

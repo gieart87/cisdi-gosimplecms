@@ -10,10 +10,12 @@ import (
 
 type PostService interface {
 	GetPosts(limit, offset int) ([]models.Post, int64, error)
+	GetActivePosts(limit, offset int) ([]models.Post, int64, error)
 	FindBySlug(string) (*models.Post, error)
 	Create(models.CreatePostRequest) (*models.Post, error)
 	FindCategoriesByIDs([]uint) ([]models.Category, error)
 	FindTagsByIDs([]uint) ([]models.Tag, error)
+	GetTagRelationshipScores() ([]models.TagRelationship, error)
 }
 
 type postService struct {
@@ -34,6 +36,14 @@ func (p postService) GetPosts(limit, offset int) ([]models.Post, int64, error) {
 	return p.postRepository.GetPosts(limit, offset)
 }
 
+func (p postService) GetActivePosts(limit, offset int) ([]models.Post, int64, error) {
+	return p.postRepository.GetActivePosts(limit, offset)
+}
+
+func (p postService) GetTagRelationshipScores() ([]models.TagRelationship, error) {
+	return p.tagRepository.GetTagScores()
+}
+
 func (p postService) Create(req models.CreatePostRequest) (*models.Post, error) {
 
 	//tx := configs.DB.Begin()
@@ -46,6 +56,7 @@ func (p postService) Create(req models.CreatePostRequest) (*models.Post, error) 
 	post = models.Post{
 		Title:   req.Title,
 		Content: cleanContent,
+		UserID:  req.UserID,
 	}
 	if _, err := p.postRepository.CreateTx(tx, &post); err != nil {
 		//tx.Rollback()
@@ -76,9 +87,10 @@ func (p postService) Create(req models.CreatePostRequest) (*models.Post, error) 
 	// 3. Create PostVersion
 	var postVersion models.PostVersion
 	postVersion = models.PostVersion{
-		Title:   req.Title,
-		Content: cleanContent,
-		PostID:  post.ID,
+		Title:         req.Title,
+		Content:       cleanContent,
+		PostID:        post.ID,
+		VersionNumber: p.postRepository.GenerateSequentialNumber(post.ID),
 	}
 
 	_, err = p.postRepository.CreateVersionTx(tx, &postVersion)
@@ -87,7 +99,10 @@ func (p postService) Create(req models.CreatePostRequest) (*models.Post, error) 
 		return nil, errors.New("failed to create post version")
 	}
 
-	post.CurrentVersionID = postVersion.ID
+	err = p.postRepository.UpdateVersion(post.ID, postVersion.VersionNumber)
+	if err != nil {
+		return nil, errors.New("failed to update version")
+	}
 
 	if err := p.postRepository.DB().Model(&postVersion).Association("Categories").Replace(categories); err != nil {
 		//tx.Rollback()
