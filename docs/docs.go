@@ -93,6 +93,40 @@ const docTemplate = `{
             }
         },
         "/api/v1/admin/posts": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Manage Posts"
+                ],
+                "summary": "Get all posts",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/gosimplecms_controllers_admin_posts_list.Post"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new post",
                 "consumes": [
@@ -223,6 +257,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "gosimplecms_controllers_admin_posts_list.Post": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CreateCategoryRequest": {
             "type": "object",
             "properties": {
@@ -237,26 +288,29 @@ const docTemplate = `{
         "models.CreatePostRequest": {
             "type": "object",
             "properties": {
-                "body": {
-                    "type": "string"
-                },
                 "category_ids": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
-                "status": {
+                "content": {
                     "type": "string"
                 },
-                "tags": {
+                "slug": {
+                    "type": "string"
+                },
+                "tag_ids": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "title": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -264,7 +318,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
@@ -281,7 +335,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "status": {
                     "type": "string"
@@ -337,7 +391,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "string"
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"

@@ -1,5 +1,16 @@
 basePath: /
 definitions:
+  gosimplecms_controllers_admin_posts_list.Post:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
   models.CreateCategoryRequest:
     properties:
       name:
@@ -9,25 +20,27 @@ definitions:
     type: object
   models.CreatePostRequest:
     properties:
-      body:
-        type: string
       category_ids:
         items:
-          type: string
+          type: integer
         type: array
-      status:
+      content:
         type: string
-      tags:
+      slug:
+        type: string
+      tag_ids:
         items:
-          type: string
+          type: integer
         type: array
       title:
         type: string
+      user_id:
+        type: integer
     type: object
   models.CreateUpdateCategoryResponse:
     properties:
       id:
-        type: string
+        type: integer
       name:
         type: string
       slug:
@@ -38,7 +51,7 @@ definitions:
       created_at:
         type: string
       id:
-        type: string
+        type: integer
       status:
         type: string
       title:
@@ -74,7 +87,7 @@ definitions:
       email:
         type: string
       id:
-        type: string
+        type: integer
       name:
         type: string
       role:
@@ -137,6 +150,27 @@ paths:
       tags:
       - Manage Categories
   /api/v1/admin/posts:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/gosimplecms_controllers_admin_posts_list.Post'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all posts
+      tags:
+      - Manage Posts
     post:
       consumes:
       - application/json
