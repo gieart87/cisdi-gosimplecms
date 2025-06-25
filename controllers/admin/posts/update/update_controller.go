@@ -28,7 +28,7 @@ func NewPostUpdateController(postService services.PostService) *PostUpdateContro
 // @Param users body models.CreatePostRequest true "Post data"
 // @Success 201 {object} models.CreateUpdatePostResponse
 // @Failure 400 {object} map[string]string
-// @Router /api/v1/admin/posts/{id} [post]
+// @Router /api/v1/admin/posts/{id} [put]
 func (ctl *PostUpdateController) Update(c *gin.Context) {
 	var updatePostRequest models.UpdatePostRequest
 

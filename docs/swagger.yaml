@@ -231,7 +231,7 @@ paths:
       tags:
       - Manage Posts
   /api/v1/admin/posts/{id}:
-    post:
+    put:
       consumes:
       - application/json
       description: Update existing post

@@ -170,7 +170,7 @@ const docTemplate = `{
             }
         },
         "/api/v1/admin/posts/{id}": {
-            "post": {
+            "put": {
                 "description": "Update existing post",
                 "consumes": [
                     "application/json"
