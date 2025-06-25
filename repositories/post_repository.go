@@ -158,7 +158,7 @@ func (p postRepository) GenerateSequentialNumber(postID uint) int64 {
 
 func (p postRepository) UpdateVersion(postID uint, versionNumber int64) error {
 	var post models.Post
-	err := configs.DB.Model(&post).
+	err := configs.DB.Debug().Model(&post).
 		Where("id = ?", postID).
 		Update("current_version_number", versionNumber).Error
 	if err != nil {

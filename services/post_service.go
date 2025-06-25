@@ -134,6 +134,7 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 	}
 
 	needCreateVersion := p.needCreateVersion(post, req)
+	needUpdateCurrentVersionNumber := post.Status != models.PostStatusPublished && req.Status == models.PostStatusPublished
 
 	post.Title = req.Title
 	post.Content = cleanContent
@@ -167,6 +168,12 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 		return nil, errors.New("failed to associate tags")
 	}
 
+	// get updated post
+	post, err = p.postRepository.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
+
 	if needCreateVersion {
 		// 3. Create PostVersion
 		var postVersion models.PostVersion
@@ -184,7 +191,7 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 			return nil, errors.New("failed to create post version")
 		}
 
-		if post.Status != models.PostStatusPublished && req.Status == models.PostStatusPublished {
+		if needUpdateCurrentVersionNumber {
 			err = p.postRepository.UpdateVersion(post.ID, postVersion.VersionNumber)
 			if err != nil {
 				return nil, errors.New("failed to update version")
@@ -206,11 +213,6 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 	//if err != nil {
 	//	return nil, errors.New("error committing transaction")
 	//}
-
-	post, err = p.postRepository.FindByID(id)
-	if err != nil {
-		return nil, err
-	}
 
 	return post, nil
 }
