@@ -12,6 +12,7 @@ import (
 	adminCategoryList "gosimplecms/controllers/admin/categories/list"
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
+	adminPostPublish "gosimplecms/controllers/admin/posts/publish"
 	adminPostUpdate "gosimplecms/controllers/admin/posts/update"
 	adminTagCreate "gosimplecms/controllers/admin/tags/create"
 	adminTagList "gosimplecms/controllers/admin/tags/list"
@@ -91,6 +92,7 @@ func startServer(port string) {
 	adminTagListController := adminTagList.NewTagListController(tagService)
 	adminPostCreateController := adminPostCreate.NewPostCreateController(postService)
 	adminPostUpdateController := adminPostUpdate.NewPostUpdateController(postService)
+	adminPostPublishController := adminPostPublish.NewPostPublishController(postService)
 	adminPostListController := adminPostList.NewPostListController(postService)
 
 	routes.SetupRoutes(r,
@@ -106,6 +108,7 @@ func startServer(port string) {
 		adminTagListController,
 		adminPostCreateController,
 		adminPostUpdateController,
+		adminPostPublishController,
 		adminPostListController,
 	)
 

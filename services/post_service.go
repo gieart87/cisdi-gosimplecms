@@ -103,11 +103,6 @@ func (p postService) Create(req models.CreatePostRequest) (*models.Post, error) 
 		return nil, errors.New("failed to create post version")
 	}
 
-	err = p.postRepository.UpdateVersion(post.ID, postVersion.VersionNumber)
-	if err != nil {
-		return nil, errors.New("failed to update version")
-	}
-
 	if err := p.postRepository.DB().Model(&postVersion).Association("Categories").Replace(categories); err != nil {
 		//tx.Rollback()
 		return nil, errors.New("failed to associate categories")
@@ -142,6 +137,9 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 
 	post.Title = req.Title
 	post.Content = cleanContent
+	if req.Status != "" {
+		post.Status = req.Status
+	}
 
 	if _, err := p.postRepository.UpdateTx(tx, post); err != nil {
 		//tx.Rollback()
@@ -185,9 +183,11 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 			return nil, errors.New("failed to create post version")
 		}
 
-		err = p.postRepository.UpdateVersion(post.ID, postVersion.VersionNumber)
-		if err != nil {
-			return nil, errors.New("failed to update version")
+		if post.Status != models.PostStatusPublished && req.Status == models.PostStatusPublished {
+			err = p.postRepository.UpdateVersion(post.ID, postVersion.VersionNumber)
+			if err != nil {
+				return nil, errors.New("failed to update version")
+			}
 		}
 
 		if err := p.postRepository.DB().Model(&postVersion).Association("Categories").Replace(categories); err != nil {
@@ -205,6 +205,11 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 	//if err != nil {
 	//	return nil, errors.New("error committing transaction")
 	//}
+
+	post, err = p.postRepository.FindByID(id)
+	if err != nil {
+		return nil, err
+	}
 
 	return post, nil
 }

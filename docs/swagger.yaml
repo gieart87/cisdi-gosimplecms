@@ -279,6 +279,33 @@ paths:
       summary: Update existing post
       tags:
       - Manage Posts
+  /api/v1/admin/posts/{id}/publish:
+    put:
+      consumes:
+      - application/json
+      description: Publish existing post
+      parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.CreateUpdatePostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Publish existing post
+      tags:
+      - Manage Posts
   /api/v1/admin/tags:
     get:
       produces:

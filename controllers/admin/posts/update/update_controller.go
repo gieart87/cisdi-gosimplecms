@@ -100,5 +100,5 @@ func (ctl *PostUpdateController) Update(c *gin.Context) {
 		return
 	}
 
-	response.CreatedResponse(c, ctl.transformToResponse(post), "successfully create post")
+	response.SuccessResponse(c, ctl.transformToResponse(post), "successfully update post")
 }

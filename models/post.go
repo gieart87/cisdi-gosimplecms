@@ -45,6 +45,7 @@ type UpdatePostRequest struct {
 	Content     string `json:"content"`
 	TagIDs      []uint `json:"tag_ids"`
 	CategoryIDs []uint `json:"category_ids"`
+	Status      string `json:"status"`
 }
 
 type PaginationMeta struct {
