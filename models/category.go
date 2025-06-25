@@ -4,6 +4,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
+	"regexp"
 )
 
 type Category struct {
@@ -37,6 +38,9 @@ type CreateUpdateCategoryResponse struct {
 
 func (r CreateCategoryRequest) Validate() error {
 	return validation.ValidateStruct(&r,
-		validation.Field(&r.Name, validation.Required, validation.RuneLength(3, 100)),
+		validation.Field(&r.Name,
+			validation.Required, validation.RuneLength(3, 100),
+			validation.Match(regexp.MustCompile(`^[a-zA-Z0-9 ]+$`)).Error("only letters, numbers, and spaces are allowed"),
+		),
 	)
 }

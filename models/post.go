@@ -4,6 +4,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
+	"regexp"
 )
 
 type Post struct {
@@ -58,6 +59,7 @@ func (r CreatePostRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Title,
 			validation.Required.Error("title is required"),
+			validation.Match(regexp.MustCompile(`^[a-zA-Z0-9 ]+$`)).Error("only letters, numbers, and spaces are allowed"),
 			validation.RuneLength(3, 200).Error("title must be between 3 and 200 characters"),
 		),
 		validation.Field(&r.Content,
