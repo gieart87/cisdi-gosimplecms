@@ -20,6 +20,12 @@ type TagScore struct {
 	CoOccurrentScore int32   `json:"co_occurrent_score"`
 }
 
+type TagScorePost struct {
+	Tag1ID uint
+	Tag2ID uint
+	Score  float64
+}
+
 func (p *Tag) BeforeCreate(tx *gorm.DB) (err error) {
 	p.Slug = slug.Make(p.Name)
 	return

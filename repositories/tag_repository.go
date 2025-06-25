@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"gosimplecms/configs"
 	"gosimplecms/models"
 )
@@ -9,6 +11,7 @@ type TagRepository interface {
 	FirstOrCreate(tag models.Tag) (*models.Tag, error)
 	FindByIDs(ids []uint) ([]models.Tag, error)
 	GetTagScores() ([]models.TagRelationship, error)
+	CalculateTagRelationshipScore(tagIDs []uint) ([]models.TagScorePost, float64, error)
 }
 
 type tagRepository struct{}
@@ -49,22 +52,39 @@ func (t tagRepository) GetTagScores() ([]models.TagRelationship, error) {
 	return scores, nil
 }
 
-//
-//func (t tagRepository) GetTagScores([]models.TagScore, error) {
-//	var tagScores []models.TagScore
-//
-//	sqlStr := `SELECT
-//	LEAST(pt1.tag_id, pt2.tag_id) AS tag1_id,
-//		GREATEST(pt1.tag_id, pt2.tag_id) AS tag2_id,
-//		COUNT(DISTINCT pt1.post_id) AS co_occurrence_count
-//	FROM post_tags pt1
-//	JOIN post_tags pt2
-//	ON pt1.post_id = pt2.post_id
-//	AND pt1.tag_id < pt2.tag_id
-//	GROUP BY tag1_id, tag2_id;`
-//
-//	err := configs.DB.Exec(sqlStr)
-//	if err != nil {
-//		return nil, err
-//	}
-//}
+// CalculateTagRelationshipScore menghitung skor total dari pasangan tag yang ada pada satu post
+func (t tagRepository) CalculateTagRelationshipScore(tagIDs []uint) ([]models.TagScorePost, float64, error) {
+	if len(tagIDs) < 2 {
+		return nil, 0, nil
+	}
+
+	var totalScore float64
+	var scores []models.TagScorePost
+
+	for i := 0; i < len(tagIDs); i++ {
+		for j := i + 1; j < len(tagIDs); j++ {
+			tagA := tagIDs[i]
+			tagB := tagIDs[j]
+
+			var rel models.TagRelationship
+			err := configs.DB.
+				Where("(tag1_id = ? AND tag2_id = ?) OR (tag1_id = ? AND tag2_id = ?)",
+					tagA, tagB, tagB, tagA).
+				First(&rel).Error
+			if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, 0, err
+			}
+
+			score := rel.Score
+			totalScore += score
+
+			scores = append(scores, models.TagScorePost{
+				Tag1ID: tagA,
+				Tag2ID: tagB,
+				Score:  score,
+			})
+		}
+	}
+
+	return scores, totalScore, nil
+}

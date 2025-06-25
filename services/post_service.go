@@ -19,6 +19,7 @@ type PostService interface {
 	FindCategoriesByIDs([]uint) ([]models.Category, error)
 	FindTagsByIDs([]uint) ([]models.Tag, error)
 	GetTagRelationshipScores() ([]models.TagRelationship, error)
+	CalculateTagRelationshipScore(tagIDs []uint) ([]models.TagScorePost, float64, error)
 }
 
 type postService struct {
@@ -237,4 +238,8 @@ func (p postService) FindCategoriesByIDs(categoryIDs []uint) ([]models.Category,
 
 func (p postService) FindTagsByIDs(tagIDs []uint) ([]models.Tag, error) {
 	return p.tagRepository.FindByIDs(tagIDs)
+}
+
+func (p postService) CalculateTagRelationshipScore(tagIDs []uint) ([]models.TagScorePost, float64, error) {
+	return p.tagRepository.CalculateTagRelationshipScore(tagIDs)
 }
