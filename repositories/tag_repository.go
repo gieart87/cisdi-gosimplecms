@@ -9,12 +9,38 @@ import (
 
 type TagRepository interface {
 	FirstOrCreate(tag models.Tag) (*models.Tag, error)
+	Create(tag models.Tag) (*models.Tag, error)
 	FindByIDs(ids []uint) ([]models.Tag, error)
 	GetTagScores() ([]models.TagRelationship, error)
+	GetTags() ([]models.Tag, error)
 	CalculateTagRelationshipScore(tagIDs []uint) ([]models.TagScorePost, float64, error)
 }
 
 type tagRepository struct{}
+
+func (t tagRepository) GetTags() ([]models.Tag, error) {
+	var tags []models.Tag
+
+	err := configs.DB.Find(&tags).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return tags, nil
+}
+
+func NewTagRepository() TagRepository {
+	return &tagRepository{}
+}
+
+func (t tagRepository) Create(tag models.Tag) (*models.Tag, error) {
+	err := configs.DB.Create(&tag).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &tag, nil
+}
 
 func (t tagRepository) FindByIDs(ids []uint) ([]models.Tag, error) {
 	var tags []models.Tag
@@ -25,10 +51,6 @@ func (t tagRepository) FindByIDs(ids []uint) ([]models.Tag, error) {
 	}
 
 	return tags, nil
-}
-
-func NewTagRepository() TagRepository {
-	return &tagRepository{}
 }
 
 func (t tagRepository) FirstOrCreate(req models.Tag) (*models.Tag, error) {

@@ -7,6 +7,8 @@ import (
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
 	adminPostUpdate "gosimplecms/controllers/admin/posts/update"
+	adminTagCreate "gosimplecms/controllers/admin/tags/create"
+	adminTagList "gosimplecms/controllers/admin/tags/list"
 	"gosimplecms/controllers/posts/detail"
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
@@ -28,6 +30,8 @@ func SetupRoutes(
 	tagScorePostController *tagScore.PostTagScoreController,
 	adminCategoryCreateController *adminCategoryCreate.CategoryCreateController,
 	adminCategoryListController *adminCategoryList.CategoryListController,
+	adminTagCreateController *adminTagCreate.TagCreateController,
+	adminTagListController *adminTagList.TagListController,
 	adminPostCreateController *adminPostCreate.PostCreateController,
 	adminPostUpdateController *adminPostUpdate.PostUpdateController,
 	adminPostListController *adminPostList.PostListController,
@@ -67,6 +71,18 @@ func SetupRoutes(
 		adminV1Categories.GET("",
 			middlewares.AllowRoleMiddleware(models.RoleAdmin, models.RoleAuthor, models.RoleEditor),
 			adminCategoryListController.GetCategories,
+		)
+	}
+
+	adminV1Tags := adminV1.Group("/tags")
+	{
+		adminV1Tags.POST("",
+			middlewares.AllowRoleMiddleware(models.RoleAdmin),
+			adminTagCreateController.Create,
+		)
+		adminV1Tags.GET("",
+			middlewares.AllowRoleMiddleware(models.RoleAdmin, models.RoleAuthor, models.RoleEditor),
+			adminTagListController.GetTags,
 		)
 	}
 

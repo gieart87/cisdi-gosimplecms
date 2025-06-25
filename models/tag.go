@@ -1,8 +1,10 @@
 package models
 
 import (
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
+	"regexp"
 )
 
 type Tag struct {
@@ -29,4 +31,24 @@ type TagScorePost struct {
 func (p *Tag) BeforeCreate(tx *gorm.DB) (err error) {
 	p.Slug = slug.Make(p.Name)
 	return
+}
+
+type CreateTagRequest struct {
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+type CreateUpdateTagResponse struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+func (r CreateTagRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Name,
+			validation.Required, validation.RuneLength(3, 100),
+			validation.Match(regexp.MustCompile(`^[a-zA-Z0-9 ]+$`)).Error("only letters, numbers, and spaces are allowed"),
+		),
+	)
 }

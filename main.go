@@ -13,6 +13,8 @@ import (
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
 	adminPostUpdate "gosimplecms/controllers/admin/posts/update"
+	adminTagCreate "gosimplecms/controllers/admin/tags/create"
+	adminTagList "gosimplecms/controllers/admin/tags/list"
 	"gosimplecms/controllers/posts/detail"
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
@@ -72,6 +74,7 @@ func startServer(port string) {
 	categoryRepo := repositories.NewCategoryRepository()
 
 	userService := services.NewUserService(userRepo)
+	tagService := services.NewTagService(tagRepo)
 	postService := services.NewPostService(postRepo, tagRepo, categoryRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
 
@@ -84,6 +87,8 @@ func startServer(port string) {
 
 	adminCategoryCreateController := adminCategoryCreate.NewCategoryCreateController(categoryService)
 	adminCategoryListController := adminCategoryList.NewCategoryListController(categoryService)
+	adminTagCreateController := adminTagCreate.NewTagCreateController(tagService)
+	adminTagListController := adminTagList.NewTagListController(tagService)
 	adminPostCreateController := adminPostCreate.NewPostCreateController(postService)
 	adminPostUpdateController := adminPostUpdate.NewPostUpdateController(postService)
 	adminPostListController := adminPostList.NewPostListController(postService)
@@ -97,6 +102,8 @@ func startServer(port string) {
 		tagScoreController,
 		adminCategoryCreateController,
 		adminCategoryListController,
+		adminTagCreateController,
+		adminTagListController,
 		adminPostCreateController,
 		adminPostUpdateController,
 		adminPostListController,

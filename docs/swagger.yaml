@@ -56,6 +56,13 @@ definitions:
       user_id:
         type: integer
     type: object
+  models.CreateTagRequest:
+    properties:
+      name:
+        type: string
+      slug:
+        type: string
+    type: object
   models.CreateUpdateCategoryResponse:
     properties:
       id:
@@ -78,6 +85,15 @@ definitions:
       title:
         type: string
       updated_at:
+        type: string
+    type: object
+  models.CreateUpdateTagResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      slug:
         type: string
     type: object
   models.LoginRequest:
@@ -263,6 +279,55 @@ paths:
       summary: Update existing post
       tags:
       - Manage Posts
+  /api/v1/admin/tags:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.CreateUpdateCategoryResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all tags
+      tags:
+      - Manage Tags
+    post:
+      consumes:
+      - application/json
+      description: Create a new tag
+      parameters:
+      - description: Tag data
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateTagRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CreateUpdateTagResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Create a new tag
+      tags:
+      - Manage Tags
   /api/v1/posts:
     get:
       produces:
