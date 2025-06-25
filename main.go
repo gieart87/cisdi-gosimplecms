@@ -130,6 +130,11 @@ func runSeeder() {
 	if err != nil {
 		log.Fatal("Run SeedUsers failed:", err)
 	}
+
+	err = seeds.SeedTagsAndCategories(configs.DB)
+	if err != nil {
+		log.Fatal("Run SeedTagsCategories failed:", err)
+	}
 	fmt.Println("✅ Seeder executed")
 }
 
