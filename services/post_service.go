@@ -1,12 +1,14 @@
 package services
 
 import (
+	"database/sql"
 	"errors"
 	"github.com/microcosm-cc/bluemonday"
 	"gosimplecms/configs"
 	"gosimplecms/models"
 	"gosimplecms/repositories"
 	"gosimplecms/utils/helper"
+	"time"
 )
 
 type PostService interface {
@@ -140,6 +142,13 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 	post.Content = cleanContent
 	if req.Status != "" {
 		post.Status = req.Status
+
+		if req.Status == models.PostStatusPublished {
+			post.PublishedAt = sql.NullTime{
+				Time:  time.Now(),
+				Valid: true,
+			}
+		}
 	}
 
 	if _, err := p.postRepository.UpdateTx(tx, post); err != nil {
@@ -183,6 +192,13 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 			PostID:        post.ID,
 			VersionNumber: p.postRepository.GenerateSequentialNumber(post.ID),
 			Status:        post.Status,
+		}
+
+		if req.Status == models.PostStatusPublished {
+			postVersion.PublishedAt = sql.NullTime{
+				Time:  time.Now(),
+				Valid: true,
+			}
 		}
 
 		_, err = p.postRepository.CreateVersionTx(tx, &postVersion)

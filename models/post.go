@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
@@ -9,12 +10,13 @@ import (
 
 type Post struct {
 	gorm.Model
-	Title                string `json:"title"`
-	Slug                 string `gorm:"size:255;not null;uniqueIndex"`
-	Status               string `gorm:"size:20;not null;index;default:'DRAFT'"`
-	CurrentVersionNumber int64  `json:"current_version_number"`
-	Content              string `json:"content"`
-	UserID               uint   `json:"user_id"`
+	Title                string       `json:"title"`
+	Slug                 string       `gorm:"size:255;not null;uniqueIndex"`
+	Status               string       `gorm:"size:20;not null;index;default:'DRAFT'"`
+	CurrentVersionNumber int64        `json:"current_version_number"`
+	Content              string       `json:"content"`
+	UserID               uint         `json:"user_id"`
+	PublishedAt          sql.NullTime `json:"published_at"`
 	User                 User
 	Categories           []Category `gorm:"many2many:post_categories" json:"categories"`
 	Tags                 []Tag      `gorm:"many2many:post_tags" json:"tags"`

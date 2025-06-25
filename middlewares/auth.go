@@ -22,7 +22,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"code":  http.StatusUnauthorized,
-				"error": "Missing token",
+				"error": err.Error(),
 			})
 			return
 		}
