@@ -171,10 +171,11 @@ func (p postService) Update(id uint, req models.UpdatePostRequest) (*models.Post
 		// 3. Create PostVersion
 		var postVersion models.PostVersion
 		postVersion = models.PostVersion{
-			Title:         req.Title,
-			Content:       cleanContent,
+			Title:         post.Title,
+			Content:       post.Content,
 			PostID:        post.ID,
 			VersionNumber: p.postRepository.GenerateSequentialNumber(post.ID),
+			Status:        post.Status,
 		}
 
 		_, err = p.postRepository.CreateVersionTx(tx, &postVersion)
