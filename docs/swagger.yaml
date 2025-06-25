@@ -230,6 +230,34 @@ paths:
       summary: Create a new post
       tags:
       - Manage Posts
+  /api/v1/admin/posts/{id}:
+    post:
+      consumes:
+      - application/json
+      description: Update existing post
+      parameters:
+      - description: Post data
+        in: body
+        name: users
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePostRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.CreateUpdatePostResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update existing post
+      tags:
+      - Manage Posts
   /api/v1/posts:
     get:
       produces:

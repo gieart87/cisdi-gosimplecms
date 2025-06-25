@@ -8,7 +8,7 @@ import (
 type PostVersion struct {
 	gorm.Model
 	Title         string `json:"title"`
-	Slug          string `gorm:"size:255;not null;uniqueIndex"`
+	Slug          string `gorm:"size:255;not null;index"`
 	VersionNumber int64  `gorm:"not null;index"`
 	Status        string `gorm:"size:20;not null;index;default:'DRAFT'"`
 	Content       string `json:"content"`

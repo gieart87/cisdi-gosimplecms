@@ -40,6 +40,13 @@ type CreatePostRequest struct {
 	UserID      uint   `json:"user_id"`
 }
 
+type UpdatePostRequest struct {
+	Title       string `json:"title"`
+	Content     string `json:"content"`
+	TagIDs      []uint `json:"tag_ids"`
+	CategoryIDs []uint `json:"category_ids"`
+}
+
 type PaginationMeta struct {
 	Total int64 `json:"total"`
 	Page  int   `json:"page"`
@@ -56,6 +63,28 @@ type CreateUpdatePostResponse struct {
 }
 
 func (r CreatePostRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Title,
+			validation.Required.Error("title is required"),
+			validation.Match(regexp.MustCompile(`^[a-zA-Z0-9 ]+$`)).Error("only letters, numbers, and spaces are allowed"),
+			validation.RuneLength(3, 200).Error("title must be between 3 and 200 characters"),
+		),
+		validation.Field(&r.Content,
+			validation.Required.Error("content is required"),
+			validation.RuneLength(10, 5000).Error("body must be between 10 and 5000 characters"),
+		),
+		validation.Field(&r.TagIDs,
+			validation.Required.Error("at least one tag is required"),
+			validation.Each(validation.Required),
+		),
+		validation.Field(&r.CategoryIDs,
+			validation.Required.Error("at least one category is required"),
+			validation.Each(validation.Required),
+		),
+	)
+}
+
+func (r UpdatePostRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Title,
 			validation.Required.Error("title is required"),

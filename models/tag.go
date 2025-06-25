@@ -7,10 +7,10 @@ import (
 
 type Tag struct {
 	gorm.Model
-	Name       string `json:"name"`
-	Slug       string `gorm:"size:255;not null;uniqueIndex"`
-	Posts      []Post `gorm:"many2many:post_tags"`
-	UsageCount int64  `json:"usage_count;default:0"`
+	Name       string `gorm:"size:255;not null;" json:"name,omitempty"`
+	Slug       string `gorm:"size:255;not null;uniqueIndex" json:"slug,omitempty"`
+	Posts      []Post `gorm:"many2many:post_tags" json:"-"`
+	UsageCount int64  `gorm:"usage_count;default:0"`
 }
 
 type TagScore struct {

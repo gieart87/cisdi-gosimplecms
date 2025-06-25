@@ -115,7 +115,8 @@ func (p postRepository) Create(post models.Post) (*models.Post, error) {
 func (p postRepository) FindByID(id uint) (*models.Post, error) {
 	var post models.Post
 
-	err := configs.DB.Where("id = ?", id).Take(&post).Error
+	err := configs.DB.Preload("Categories").Preload("Tags").
+		Where("id = ?", id).Take(&post).Error
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,8 @@ func (p postRepository) FindByID(id uint) (*models.Post, error) {
 func (p postRepository) FindBySlug(slug string) (*models.Post, error) {
 	var post models.Post
 
-	err := configs.DB.Where("slug = ?", slug).Take(&post).Error
+	err := configs.DB.Preload("Categories").Preload("Tags").
+		Where("slug = ?", slug).Take(&post).Error
 	if err != nil {
 		return nil, err
 	}

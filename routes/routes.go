@@ -6,6 +6,7 @@ import (
 	adminCategoryList "gosimplecms/controllers/admin/categories/list"
 	adminPostCreate "gosimplecms/controllers/admin/posts/create"
 	adminPostList "gosimplecms/controllers/admin/posts/list"
+	adminPostUpdate "gosimplecms/controllers/admin/posts/update"
 	"gosimplecms/controllers/posts/detail"
 	"gosimplecms/controllers/posts/list"
 	tagScore "gosimplecms/controllers/posts/tagscore"
@@ -28,6 +29,7 @@ func SetupRoutes(
 	adminCategoryCreateController *adminCategoryCreate.CategoryCreateController,
 	adminCategoryListController *adminCategoryList.CategoryListController,
 	adminPostCreateController *adminPostCreate.PostCreateController,
+	adminPostUpdateController *adminPostUpdate.PostUpdateController,
 	adminPostListController *adminPostList.PostListController,
 
 ) {
@@ -73,6 +75,10 @@ func SetupRoutes(
 		adminV1Posts.POST("",
 			middlewares.AllowRoleMiddleware(models.RoleAdmin, models.RoleAuthor, models.RoleEditor),
 			adminPostCreateController.Create,
+		)
+		adminV1Posts.PUT("/:id",
+			middlewares.AllowRoleMiddleware(models.RoleAdmin, models.RoleAuthor, models.RoleEditor),
+			adminPostUpdateController.Update,
 		)
 		adminV1Posts.GET("",
 			middlewares.AllowRoleMiddleware(models.RoleAdmin, models.RoleAuthor, models.RoleEditor),

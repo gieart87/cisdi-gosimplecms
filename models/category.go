@@ -9,9 +9,9 @@ import (
 
 type Category struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Slug  string `gorm:"size:255;not null;uniqueIndex"`
-	Posts []Post `gorm:"many2many:post_categories"`
+	Name  string `gorm:"size:255;not null;" json:"name,omitempty"`
+	Slug  string `gorm:"size:255;not null;uniqueIndex" json:"slug,omitempty"`
+	Posts []Post `gorm:"many2many:post_categories" json:"-"`
 }
 
 func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
