@@ -25,6 +25,7 @@ func NewPostUpdateController(postService services.PostService) *PostUpdateContro
 // @Tags Manage Posts
 // @Accept json
 // @Produce json
+// @Param id path string true "Post ID"
 // @Param users body models.CreatePostRequest true "Post data"
 // @Success 201 {object} models.CreateUpdatePostResponse
 // @Failure 400 {object} map[string]string

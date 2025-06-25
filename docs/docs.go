@@ -184,6 +184,13 @@ const docTemplate = `{
                 "summary": "Update existing post",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "Post ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Post data",
                         "name": "users",
                         "in": "body",

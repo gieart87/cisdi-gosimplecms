@@ -236,6 +236,11 @@ paths:
       - application/json
       description: Update existing post
       parameters:
+      - description: Post ID
+        in: path
+        name: id
+        required: true
+        type: string
       - description: Post data
         in: body
         name: users
